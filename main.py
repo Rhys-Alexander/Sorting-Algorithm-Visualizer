@@ -31,7 +31,7 @@ class Screen:
     # Visualization
     def draw(self):
         self.window.fill((0, 0, 0))
-        # TODO improve UI
+        # TODO use buttons
         controls = [
             "SPACE - Play/Pause",
             "R - Reset",
@@ -146,13 +146,17 @@ class Screen:
                 self.drawList(clear_bg=True)
                 yield True
 
+    # TODO add algorithms
 
-# TODO number of bars slider
+
 # FIXME colors bug out on low bar numbers
 def main(size=600, n=50):
-    screen = Screen(size, n)
+    # TODO number of bars slider
+    n = 20
     sorting = False
+    screen = Screen(size, n)
     clock = pygame.time.Clock()
+    # TODO tick slider
     tick = 120
     while True:
         # TODO speed slider
