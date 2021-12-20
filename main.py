@@ -6,12 +6,17 @@ pygame.init()
 
 class Algorithm:
     def __init__(self, key=False):
+        algorithms = {
+            "Bubble Sort": self.bubbleSort,
+            "Insertion Sort": self.insertionSort,
+        }
+        key_to_name = {pygame.K_b: "Bubble Sort", pygame.K_i: "Insertion Sort"}
+        self.keys = key_to_name.keys()
         if not key:
-            key = list(self.getKeys())[0]
-        name = self.key_to_name[key]
+            key = list(self.keys)[0]
+        name = key_to_name[key]
         self.name = name
-        self.algo = self.algorithms[name]
-        self.gen = None
+        self.algo = algorithms[name]
 
     def getName(self):
         return self.name
@@ -19,16 +24,16 @@ class Algorithm:
     def getGen(self):
         return self.gen
 
-    def setGen(self, draw_info, ascending):
-        self.draw_info = draw_info
-        lst = draw_info.lst
-        self.gen = self.algo(self, lst, ascending)
-
     def getKeys(self):
-        return self.key_to_name.keys()
+        return self.keys
+
+    def setGen(self, screen):
+        self.screen = screen
+        lst = screen.getList()
+        self.gen = self.algo(lst, screen.getAscending())
 
     def runDrawList(self):
-        drawList(self.draw_info, True)
+        self.screen.drawList(clear_bg=True)
 
     def bubbleSort(self, lst, ascending):
         for i in range(len(lst) - 1):
@@ -53,21 +58,29 @@ class Algorithm:
                 self.runDrawList()
                 yield True
 
-    key_to_name = {pygame.K_b: "Bubble Sort", pygame.K_i: "Insertion Sort"}
-    algorithms = {"Bubble Sort": bubbleSort, "Insertion Sort": insertionSort}
 
-
-class DrawInformation:
-    def __init__(self, width, height, n):
+class Screen:
+    def __init__(self, width, height, n, algo):
         self.width = width
         self.height = height
         self.side_pad = width / 8
         self.top_pad = height / 4
         self.n = n
+        self.ascending = True
         self.window = pygame.display.set_mode((width, height))
 
         pygame.display.set_caption("Sorting Algorithm Visualizer")
         self.genList()
+        self.draw(algo)
+
+    def getList(self):
+        return self.lst
+
+    def getAscending(self):
+        return self.ascending
+
+    def setAscending(self, ascending):
+        self.ascending = ascending
 
     def genList(self):
         lst = [random.randint(0, 100) for _ in range(self.n)]
@@ -78,75 +91,69 @@ class DrawInformation:
         self.bar_height = (self.height - self.top_pad) // (max(lst) - min(lst))
         self.start_x = self.side_pad // 2
 
+    def draw(self, algo):
+        self.window.fill((0, 0, 0))
+        # TODO improve UI
+        controls = [
+            "SPACE: Play/Pause Sorting",
+            "R: Reset",
+            "A: Ascending",
+            "D: Descending",
+            "I: Insertion Sort",
+            "B: Bubble Sort",
+        ]
+        for i, control in enumerate(controls):
+            color = 255, 255, 255
+            if control[0] == "A" and self.ascending:
+                color = 0, 255, 255
+            if control[0] == "D" and not self.ascending:
+                color = 0, 255, 255
+            if control[3:] == algo.getName():
+                color = 255, 0, 255
 
-def draw(draw_info, algo_name, ascending):
-    draw_info.window.fill((0, 0, 0))
-    # TODO improve UI
-    controls = [
-        "SPACE: Play/Pause Sorting",
-        "R: Reset",
-        "A: Ascending",
-        "D: Descending",
-        "I: Insertion Sort",
-        "B: Bubble Sort",
-    ]
-    for i, control in enumerate(controls):
-        color = 255, 255, 255
-        if control[0] == "A" and ascending:
-            color = 0, 255, 255
-        if control[0] == "D" and not ascending:
-            color = 0, 255, 255
-        if control[3:] == algo_name:
-            color = 255, 0, 255
+            self.window.blit(
+                pygame.font.SysFont("helvetica", 16).render(
+                    control,
+                    1,
+                    color,
+                ),
+                (10, 10 + 20 * i),
+            )
 
-        draw_info.window.blit(
-            pygame.font.SysFont("helvetica", 16).render(
-                control,
-                1,
-                color,
-            ),
-            (10, 10 + 20 * i),
-        )
+        self.drawList()
 
-    drawList(draw_info)
+    def drawList(self, clear_bg=False):
+        if clear_bg:
+            pygame.draw.rect(
+                self.window,
+                (0, 0, 0),
+                (
+                    self.side_pad // 2,
+                    self.top_pad,
+                    self.width - self.side_pad,
+                    self.height,
+                ),
+            )
 
-
-def drawList(draw_info, clear_bg=False):
-    if clear_bg:
-        pygame.draw.rect(
-            draw_info.window,
-            (0, 0, 0),
-            (
-                draw_info.side_pad // 2,
-                draw_info.top_pad,
-                draw_info.width - draw_info.side_pad,
-                draw_info.height,
-            ),
-        )
-
-    list_set = list(set(draw_info.lst))
-    for i, val in enumerate(draw_info.lst):
-        x = draw_info.start_x + i * draw_info.bar_width
-        y = draw_info.height - (val - draw_info.min_val) * draw_info.bar_height
-        color = (
-            (list_set.index(val) + 1) / len(list_set) * 255,
-            (sorted(list_set, reverse=True).index(val) + 1) / len(list_set) * 255,
-            255,
-        )
-        pygame.draw.rect(
-            draw_info.window, color, (x, y, draw_info.bar_width, draw_info.height)
-        )
-    pygame.display.update()
+        list_set = list(set(self.lst))
+        for i, val in enumerate(self.lst):
+            x = self.start_x + i * self.bar_width
+            y = self.height - (val - self.min_val) * self.bar_height
+            color = (
+                (list_set.index(val) + 1) / len(list_set) * 255,
+                (sorted(list_set, reverse=True).index(val) + 1) / len(list_set) * 255,
+                255,
+            )
+            pygame.draw.rect(self.window, color, (x, y, self.bar_width, self.height))
+        pygame.display.update()
 
 
 # FIXME padding needs to scale
 def main(width=800, height=600, n=100):
-    draw_info = DrawInformation(width, height, n)
     algo = Algorithm()
-    ascending = True
+    screen = Screen(width, height, n, algo)
     sorting = False
     clock = pygame.time.Clock()
-    draw(draw_info, algo.getName(), ascending)
     while True:
         # TODO speed slider
         clock.tick(120)
@@ -154,7 +161,7 @@ def main(width=800, height=600, n=100):
             try:
                 next(algo.getGen())
             except StopIteration:
-                drawList(draw_info, clear_bg=True)
+                screen.drawList(clear_bg=True)
                 sorting = False
 
         for event in pygame.event.get():
@@ -164,18 +171,18 @@ def main(width=800, height=600, n=100):
             if event.type == pygame.KEYDOWN:
                 key = event.key
                 if key == pygame.K_r:
-                    draw_info.genList()
+                    screen.genList()
                     sorting = False
                 elif key == pygame.K_SPACE:
                     sorting = False if sorting else True
                 elif key == pygame.K_a:
-                    ascending = True
+                    screen.setAscending(True)
                 elif key == pygame.K_d:
-                    ascending = False
+                    screen.setAscending(False)
                 if key in algo.getKeys():
                     algo = Algorithm(key)
-                algo.setGen(draw_info, ascending)
-                draw(draw_info, algo.getName(), ascending)
+                algo.setGen(screen)
+                screen.draw(algo)
 
 
 if __name__ == "__main__":
