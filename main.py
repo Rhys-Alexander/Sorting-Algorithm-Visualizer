@@ -5,7 +5,9 @@ pygame.init()
 
 
 class Algorithm:
-    def __init__(self, key=pygame.K_b):
+    def __init__(self, key=False):
+        if not key:
+            key = list(self.getKeys())[0]
         name = self.key_to_name[key]
         self.name = name
         self.algo = self.algorithms[name]
@@ -51,8 +53,8 @@ class Algorithm:
                 self.runDrawList()
                 yield True
 
-    algorithms = {"Bubble Sort": bubbleSort, "Insertion Sort": insertionSort}
     key_to_name = {pygame.K_b: "Bubble Sort", pygame.K_i: "Insertion Sort"}
+    algorithms = {"Bubble Sort": bubbleSort, "Insertion Sort": insertionSort}
 
 
 class DrawInformation:
@@ -170,7 +172,8 @@ def main(width=800, height=600, n=100):
                     ascending = True
                 elif key == pygame.K_d:
                     ascending = False
-                algo = Algorithm(key) if key in algo.getKeys() else algo
+                if key in algo.getKeys():
+                    algo = Algorithm(key)
                 algo.setGen(draw_info, ascending)
                 draw(draw_info, algo.getName(), ascending)
 
