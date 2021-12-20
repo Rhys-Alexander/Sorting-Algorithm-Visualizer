@@ -4,63 +4,9 @@ import random
 pygame.init()
 
 
-class Algorithm:
-    def __init__(self, key=False):
-        algorithms = {
-            "Bubble Sort": self.bubbleSort,
-            "Insertion Sort": self.insertionSort,
-        }
-        key_to_name = {pygame.K_b: "Bubble Sort", pygame.K_i: "Insertion Sort"}
-        self.keys = key_to_name.keys()
-        if not key:
-            key = list(self.keys)[0]
-        name = key_to_name[key]
-        self.name = name
-        self.algo = algorithms[name]
-
-    def getName(self):
-        return self.name
-
-    def getGen(self):
-        return self.gen
-
-    def getKeys(self):
-        return self.keys
-
-    def setGen(self, screen):
-        self.screen = screen
-        lst = screen.getList()
-        self.gen = self.algo(lst, screen.getAscending())
-
-    def runDrawList(self):
-        self.screen.drawList(clear_bg=True)
-
-    def bubbleSort(self, lst, ascending):
-        for i in range(len(lst) - 1):
-            for j in range(len(lst) - 1 - i):
-                num1 = lst[j]
-                num2 = lst[j + 1]
-                if (num1 > num2 and ascending) or (num1 < num2 and not ascending):
-                    lst[j], lst[j + 1] = lst[j + 1], lst[j]
-                    self.runDrawList()
-                    yield True
-
-    def insertionSort(self, lst, ascending):
-        for i in range(1, len(lst)):
-            current = lst[i]
-            while True:
-                ascending_sort = i > 0 and lst[i - 1] > current and ascending
-                descending_sort = i > 0 and lst[i - 1] < current and not ascending
-                if not ascending_sort and not descending_sort:
-                    break
-                lst[i], lst[i - 1] = lst[i - 1], current
-                i -= 1
-                self.runDrawList()
-                yield True
-
-
 class Screen:
-    def __init__(self, width, height, n, algo):
+    def __init__(self, width, height, n):
+        self.algo = self.Algorithm()
         self.width = width
         self.height = height
         self.side_pad = width / 8
@@ -71,7 +17,7 @@ class Screen:
 
         pygame.display.set_caption("Sorting Algorithm Visualizer")
         self.genList()
-        self.draw(algo)
+        self.draw()
 
     def getList(self):
         return self.lst
@@ -82,6 +28,9 @@ class Screen:
     def setAscending(self, ascending):
         self.ascending = ascending
 
+    def setAlgo(self, key):
+        self.algo = self.Algorithm(key)
+
     def genList(self):
         lst = [random.randint(0, 100) for _ in range(self.n)]
         self.lst = lst
@@ -91,7 +40,7 @@ class Screen:
         self.bar_height = (self.height - self.top_pad) // (max(lst) - min(lst))
         self.start_x = self.side_pad // 2
 
-    def draw(self, algo):
+    def draw(self):
         self.window.fill((0, 0, 0))
         # TODO improve UI
         controls = [
@@ -108,7 +57,7 @@ class Screen:
                 color = 0, 255, 255
             if control[0] == "D" and not self.ascending:
                 color = 0, 255, 255
-            if control[3:] == algo.getName():
+            if control[3:] == self.algo.getName():
                 color = 255, 0, 255
 
             self.window.blit(
@@ -147,11 +96,65 @@ class Screen:
             pygame.draw.rect(self.window, color, (x, y, self.bar_width, self.height))
         pygame.display.update()
 
+    # TODO clean nesting and optimize
+    class Algorithm:
+        def __init__(self, key=False):
+            algorithms = {
+                "Bubble Sort": self.bubbleSort,
+                "Insertion Sort": self.insertionSort,
+            }
+            key_to_name = {pygame.K_b: "Bubble Sort", pygame.K_i: "Insertion Sort"}
+            self.keys = key_to_name.keys()
+            if not key:
+                key = list(self.keys)[0]
+            name = key_to_name[key]
+            self.name = name
+            self.algo = algorithms[name]
+
+        def getName(self):
+            return self.name
+
+        def getGen(self):
+            return self.gen
+
+        def getKeys(self):
+            return self.keys
+
+        def setGen(self, screen):
+            self.screen = screen
+            lst = screen.getList()
+            self.gen = self.algo(lst, screen.getAscending())
+
+        def runDrawList(self):
+            self.screen.drawList(clear_bg=True)
+
+        def bubbleSort(self, lst, ascending):
+            for i in range(len(lst) - 1):
+                for j in range(len(lst) - 1 - i):
+                    num1 = lst[j]
+                    num2 = lst[j + 1]
+                    if (num1 > num2 and ascending) or (num1 < num2 and not ascending):
+                        lst[j], lst[j + 1] = lst[j + 1], lst[j]
+                        self.runDrawList()
+                        yield True
+
+        def insertionSort(self, lst, ascending):
+            for i in range(1, len(lst)):
+                current = lst[i]
+                while True:
+                    ascending_sort = i > 0 and lst[i - 1] > current and ascending
+                    descending_sort = i > 0 and lst[i - 1] < current and not ascending
+                    if not ascending_sort and not descending_sort:
+                        break
+                    lst[i], lst[i - 1] = lst[i - 1], current
+                    i -= 1
+                    self.runDrawList()
+                    yield True
+
 
 # FIXME padding needs to scale
 def main(width=800, height=600, n=100):
-    algo = Algorithm()
-    screen = Screen(width, height, n, algo)
+    screen = Screen(width, height, n)
     sorting = False
     clock = pygame.time.Clock()
     while True:
@@ -159,7 +162,7 @@ def main(width=800, height=600, n=100):
         clock.tick(120)
         if sorting:
             try:
-                next(algo.getGen())
+                next(screen.algo.getGen())
             except StopIteration:
                 screen.drawList(clear_bg=True)
                 sorting = False
@@ -179,10 +182,10 @@ def main(width=800, height=600, n=100):
                     screen.setAscending(True)
                 elif key == pygame.K_d:
                     screen.setAscending(False)
-                if key in algo.getKeys():
-                    algo = Algorithm(key)
-                algo.setGen(screen)
-                screen.draw(algo)
+                if key in screen.algo.getKeys():
+                    screen.setAlgo(key)
+                screen.algo.setGen(screen)
+                screen.draw()
 
 
 if __name__ == "__main__":
