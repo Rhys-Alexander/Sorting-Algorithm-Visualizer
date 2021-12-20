@@ -84,13 +84,12 @@ class Screen:
                 ),
             )
 
-        list_set = list(set(self.lst))
         for i, val in enumerate(self.lst):
             x = i * self.bar_width
             y = self.height - (val - self.min_val) * self.bar_height
             color = (
-                (list_set.index(val) + 1) / len(list_set) * 255,
-                (sorted(list_set, reverse=True).index(val) + 1) / len(list_set) * 255,
+                (sorted(self.lst).index(val) + 1) / len(self.lst) * 255,
+                (sorted(self.lst, reverse=True).index(val) + 1) / len(self.lst) * 255,
                 255,
             )
             pygame.draw.rect(self.window, color, (x, y, self.bar_width, self.height))
@@ -149,8 +148,7 @@ class Screen:
     # TODO add algorithms
 
 
-# FIXME colors bug out on low bar numbers
-def main(size=600, n=50):
+def main(size=600, n=20):
     # TODO number of bars slider
     n = 20
     sorting = False
