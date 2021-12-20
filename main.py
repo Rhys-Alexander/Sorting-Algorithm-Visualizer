@@ -4,6 +4,57 @@ import random
 pygame.init()
 
 
+class Algorithm:
+    def __init__(self, key=pygame.K_b):
+        name = self.key_to_name[key]
+        self.name = name
+        self.algo = self.algorithms[name]
+        self.gen = None
+
+    def getName(self):
+        return self.name
+
+    def getGen(self):
+        return self.gen
+
+    def setGen(self, draw_info, ascending):
+        self.draw_info = draw_info
+        lst = draw_info.lst
+        self.gen = self.algo(self, lst, ascending)
+
+    def getKeys(self):
+        return self.key_to_name.keys()
+
+    def runDrawList(self):
+        drawList(self.draw_info, True)
+
+    def bubbleSort(self, lst, ascending):
+        for i in range(len(lst) - 1):
+            for j in range(len(lst) - 1 - i):
+                num1 = lst[j]
+                num2 = lst[j + 1]
+                if (num1 > num2 and ascending) or (num1 < num2 and not ascending):
+                    lst[j], lst[j + 1] = lst[j + 1], lst[j]
+                    self.runDrawList()
+                    yield True
+
+    def insertionSort(self, lst, ascending):
+        for i in range(1, len(lst)):
+            current = lst[i]
+            while True:
+                ascending_sort = i > 0 and lst[i - 1] > current and ascending
+                descending_sort = i > 0 and lst[i - 1] < current and not ascending
+                if not ascending_sort and not descending_sort:
+                    break
+                lst[i], lst[i - 1] = lst[i - 1], current
+                i -= 1
+                self.runDrawList()
+                yield True
+
+    algorithms = {"Bubble Sort": bubbleSort, "Insertion Sort": insertionSort}
+    key_to_name = {pygame.K_b: "Bubble Sort", pygame.K_i: "Insertion Sort"}
+
+
 class DrawInformation:
     def __init__(self, width, height, n):
         self.width = width
@@ -28,6 +79,7 @@ class DrawInformation:
 
 def draw(draw_info, algo_name, ascending):
     draw_info.window.fill((0, 0, 0))
+    # TODO improve UI
     controls = [
         "SPACE: Play/Pause Sorting",
         "R: Reset",
@@ -85,53 +137,20 @@ def drawList(draw_info, clear_bg=False):
     pygame.display.update()
 
 
-def bubbleSort(draw_info, ascending):
-    lst = draw_info.lst
-
-    for i in range(len(lst) - 1):
-        for j in range(len(lst) - 1 - i):
-            num1 = lst[j]
-            num2 = lst[j + 1]
-            if (num1 > num2 and ascending) or (num1 < num2 and not ascending):
-                lst[j], lst[j + 1] = lst[j + 1], lst[j]
-                drawList(draw_info, True)
-                yield True
-
-
-def insertionSort(draw_info, ascending):
-    lst = draw_info.lst
-    for i in range(1, len(lst)):
-        current = lst[i]
-        while True:
-            ascending_sort = i > 0 and lst[i - 1] > current and ascending
-            descending_sort = i > 0 and lst[i - 1] < current and not ascending
-            if not ascending_sort and not descending_sort:
-                break
-            lst[i], lst[i - 1] = lst[i - 1], current
-            i -= 1
-            drawList(draw_info, True)
-            yield True
-
-
 # FIXME padding needs to scale
 def main(width=800, height=600, n=100):
-    algo_names = {bubbleSort: "Bubble Sort", insertionSort: "Insertion Sort"}
-    algo_switches = {pygame.K_b: bubbleSort, pygame.K_i: insertionSort}
-    algo = list(algo_names.keys())[0]
-    algo_name = algo_names[algo]
-    algo_gen = None
-
-    sorting = False
-    ascending = True
-
     draw_info = DrawInformation(width, height, n)
+    algo = Algorithm()
+    ascending = True
+    sorting = False
     clock = pygame.time.Clock()
-    draw(draw_info, algo_name, ascending)
+    draw(draw_info, algo.getName(), ascending)
     while True:
+        # TODO speed slider
         clock.tick(120)
         if sorting:
             try:
-                next(algo_gen)
+                next(algo.getGen())
             except StopIteration:
                 drawList(draw_info, clear_bg=True)
                 sorting = False
@@ -151,11 +170,9 @@ def main(width=800, height=600, n=100):
                     ascending = True
                 elif key == pygame.K_d:
                     ascending = False
-                elif key in algo_switches.keys():
-                    algo = algo_switches[key]
-                    algo_name = algo_names[algo]
-                algo_gen = algo(draw_info, ascending)
-                draw(draw_info, algo_name, ascending)
+                algo = Algorithm(key) if key in algo.getKeys() else algo
+                algo.setGen(draw_info, ascending)
+                draw(draw_info, algo.getName(), ascending)
 
 
 if __name__ == "__main__":
