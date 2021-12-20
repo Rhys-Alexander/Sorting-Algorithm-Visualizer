@@ -83,7 +83,7 @@ class Screen:
                     self.height,
                 ),
             )
-
+        # FIXME min val of bar height should be 1 not 0
         for i, val in enumerate(self.lst):
             x = i * self.bar_width
             y = self.height - (val - self.min_val) * self.bar_height
@@ -148,9 +148,9 @@ class Screen:
     # TODO add algorithms
 
 
-def main(size=600, n=20):
+def main(size=600):
     # TODO number of bars slider
-    n = 20
+    n = 50
     sorting = False
     screen = Screen(size, n)
     clock = pygame.time.Clock()
