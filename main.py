@@ -139,8 +139,13 @@ class Screen:
         self.algorithms = {
             "Bubble Sort": self.bubbleSort,
             "Insertion Sort": self.insertionSort,
+            "Merge Sort": self.mergeSort,
         }
-        key_to_name = {pygame.K_b: "Bubble Sort", pygame.K_i: "Insertion Sort"}
+        key_to_name = {
+            pygame.K_b: "Bubble Sort",
+            pygame.K_i: "Insertion Sort",
+            pygame.K_m: "Merge Sort",
+        }
         self.algo_keys = key_to_name.keys()
         if not key:
             key = list(self.algo_keys)[0]
@@ -164,7 +169,6 @@ class Screen:
                     num1 < num2 and not self.ascending
                 ):
                     self.list[j], self.list[j + 1] = self.list[j + 1], self.list[j]
-                    self.drawList(clear_bg=True)
                     yield True
 
     def insertionSort(self):
@@ -179,10 +183,48 @@ class Screen:
                     break
                 self.list[i], self.list[i - 1] = self.list[i - 1], current
                 i -= 1
-                self.drawList(clear_bg=True)
                 yield True
 
-    # TODO add Merge Sort
+    def mergeSort(self, start=0, end=False):
+        if not end:
+            end = self.len_list
+        if end - start > 1:
+            middle = (start + end) // 2
+
+            yield from self.mergeSort(start, middle)
+            yield from self.mergeSort(middle, end)
+            left = self.list[start:middle]
+            right = self.list[middle:end]
+
+            a = 0
+            b = 0
+            c = start
+
+            while a < len(left) and b < len(right):
+                if left[a] < right[b]:
+                    self.list[c] = left[a]
+                    a += 1
+                else:
+                    self.list[c] = right[b]
+                    b += 1
+                c += 1
+                yield True
+
+            while a < len(left):
+                self.list[c] = left[a]
+                a += 1
+                c += 1
+                yield True
+
+            while b < len(right):
+                self.list[c] = right[b]
+                b += 1
+                c += 1
+                yield True
+
+            yield True
+
+    # TODO add Merge Sort descending functionality
     # TODO add Heap Sort
     # TODO add Quick Sort
 
@@ -197,8 +239,8 @@ def main(size=600):
             try:
                 next(screen.getGen())
             except StopIteration:
-                screen.drawList(clear_bg=True)
                 sorting = False
+            screen.drawList(clear_bg=True)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
