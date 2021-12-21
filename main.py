@@ -27,6 +27,25 @@ class Screen:
         self.bar_width = self.width // self.len_list
         self.bar_height = (self.height - self.top_pad) // max(self.list)
 
+    def setTick(self, speed):
+        self.tick = speed
+
+    def getTick(self):
+        return self.tick
+
+    def changeTick(self, up):
+        if up and self.tick < 160:
+            self.tick *= 2
+        elif not up and self.tick > 5:
+            self.tick //= 2
+
+    def changeBars(self, up):
+        if up and self.bars < 200:
+            self.bars += 10
+        elif not up and self.bars > 10:
+            self.bars -= 10
+        self.genList()
+
     # Visualization
     def update(self):
         self.gen = self.algo()
@@ -188,7 +207,16 @@ def main(size=600):
                     screen.setAscending(True)
                 elif key == pygame.K_d:
                     screen.setAscending(False)
-
+                elif key == pygame.K_LEFT:
+                    screen.changeBars(False)
+                    sorting = False
+                elif key == pygame.K_RIGHT:
+                    screen.changeBars(True)
+                    sorting = False
+                elif key == pygame.K_DOWN:
+                    screen.changeTick(False)
+                elif key == pygame.K_UP:
+                    screen.changeTick(True)
                 if key in screen.getAlgoKeys():
                     screen.setAlgo(key)
                 screen.update()
