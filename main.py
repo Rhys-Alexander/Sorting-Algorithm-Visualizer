@@ -24,7 +24,7 @@ class Screen:
         self.len_list = len(self.list)
         self.sorted_list = sorted(self.list)
         self.reverse_list = sorted(self.list, reverse=True)
-        self.bar_width = self.width // self.len_list
+        self.bar_width = self.width / self.len_list
         self.bar_height = (self.height - self.top_pad) // max(self.list)
 
     def setTick(self, speed):
@@ -122,7 +122,12 @@ class Screen:
                 (self.reverse_list.index(val) + 1) / self.len_list * 255,
                 255,
             )
-            pygame.draw.rect(self.window, color, (x, y, self.bar_width, self.height))
+            pygame.draw.rect(
+                self.window,
+                color,
+                # FIXME small gap between lines on some bar numbers
+                (x, y, self.bar_width, self.height),
+            )
         pygame.display.update()
 
     # Algorithm Methods
