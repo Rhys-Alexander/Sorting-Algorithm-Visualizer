@@ -21,12 +21,10 @@ class Screen:
         self.draw()
 
     def genList(self):
-        lst = [random.randint(0, 100) for _ in range(self.n)]
+        lst = [random.randint(1, 100) for _ in range(self.n)]
         self.lst = lst
-        self.min_val = min(lst)
-        self.max_val = max(lst)
         self.bar_width = self.width // len(lst)
-        self.bar_height = (self.height - self.top_pad) // (max(lst) - min(lst))
+        self.bar_height = (self.height - self.top_pad) // max(lst)
 
     # Visualization
     def draw(self):
@@ -83,10 +81,9 @@ class Screen:
                     self.height,
                 ),
             )
-        # FIXME min val of bar height should be 1 not 0
         for i, val in enumerate(self.lst):
             x = i * self.bar_width
-            y = self.height - (val - self.min_val) * self.bar_height
+            y = self.height - val * self.bar_height
             color = (
                 (sorted(self.lst).index(val) + 1) / len(self.lst) * 255,
                 (sorted(self.lst, reverse=True).index(val) + 1) / len(self.lst) * 255,
