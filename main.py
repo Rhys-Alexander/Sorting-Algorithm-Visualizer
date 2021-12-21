@@ -5,15 +5,14 @@ pygame.init()
 
 
 class Screen:
-    def __init__(self, size, n):
-        width, height = size // 2 * 3, size
-        print(width, height)
-        self.width = width
-        self.height = height
-        self.top_pad = height / 4
-        self.font_size = height // 20
-        self.n = n
-        self.window = pygame.display.set_mode((width, height))
+    def __init__(self, size):
+        self.bars = 50
+        self.tick = 80
+        self.width = size // 2 * 3
+        self.height = size
+        self.top_pad = self.height / 4
+        self.font_size = self.height // 20
+        self.window = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Sorting Algorithm Visualizer")
         self.setAscending()
         self.setAlgo()
@@ -21,7 +20,7 @@ class Screen:
         self.update()
 
     def genList(self):
-        self.list = [random.randint(1, 100) for _ in range(self.n)]
+        self.list = [random.randint(1, 100) for _ in range(self.bars)]
         self.len_list = len(self.list)
         self.sorted_list = sorted(self.list)
         self.reverse_list = sorted(self.list, reverse=True)
@@ -32,27 +31,39 @@ class Screen:
     def update(self):
         self.gen = self.algo()
         self.window.fill((0, 0, 0))
-        # TODO use buttons
-        controls = [
+        titles1 = [
+            f"ARROWS - {self.bars} Bars  {self.tick} Tick",
             "SPACE - Play/Pause",
             "R - Reset",
+        ]
+        for i, title in enumerate(titles1):
+            self.window.blit(
+                pygame.font.Font(None, self.font_size).render(
+                    title,
+                    1,
+                    (255, 255, 255),
+                ),
+                (10, 10 + self.font_size * i),
+            )
+
+        titles2 = [
             "A - Ascending",
             "D - Descending",
         ]
-        for i, control in enumerate(controls):
+        for i, title in enumerate(titles2):
             color = 255, 255, 255
-            if control[0] == "A" and self.ascending:
+            if title[0] == "A" and self.ascending:
                 color = 0, 255, 255
-            if control[0] == "D" and not self.ascending:
+            if title[0] == "D" and not self.ascending:
                 color = 0, 255, 255
 
             self.window.blit(
                 pygame.font.Font(None, self.font_size).render(
-                    control,
+                    title,
                     1,
                     color,
                 ),
-                (10, 10 + self.font_size * i),
+                (self.width // 2, 10 + self.font_size * i),
             )
 
         algorithms = [f"{name[0]} - {name}" for name in self.algorithms.keys()]
@@ -67,7 +78,7 @@ class Screen:
                     1,
                     color,
                 ),
-                (self.width // 2, 10 + self.font_size * i),
+                (self.width / 4 * 3, 10 + self.font_size * i),
             )
 
         self.drawList()
@@ -150,15 +161,11 @@ class Screen:
 
 
 def main(size=600):
-    # TODO number of bars slider
-    bars = 50
     sorting = False
-    screen = Screen(size, bars)
+    screen = Screen(size)
     clock = pygame.time.Clock()
-    # TODO tick slider
-    tick = 120
     while True:
-        clock.tick(tick)
+        clock.tick(screen.getTick())
         if sorting:
             try:
                 next(screen.getGen())
@@ -181,6 +188,7 @@ def main(size=600):
                     screen.setAscending(True)
                 elif key == pygame.K_d:
                     screen.setAscending(False)
+
                 if key in screen.getAlgoKeys():
                     screen.setAlgo(key)
                 screen.update()
