@@ -1,5 +1,6 @@
 import pygame
 import random
+from math import ceil
 
 pygame.init()
 
@@ -24,7 +25,8 @@ class Screen:
         self.len_list = len(self.list)
         self.sorted_list = sorted(self.list)
         self.reverse_list = sorted(self.list, reverse=True)
-        self.bar_width = self.width / self.len_list
+        self.bar_spacing = self.width / self.len_list
+        self.bar_width = ceil(self.bar_spacing)
         self.bar_height = (self.height - self.top_pad) // max(self.list)
 
     def setTick(self, speed):
@@ -115,7 +117,7 @@ class Screen:
                 ),
             )
         for i, val in enumerate(self.list):
-            x = i * self.bar_width
+            x = i * self.bar_spacing
             y = self.height - val * self.bar_height
             color = (
                 (self.sorted_list.index(val) + 1) / self.len_list * 255,
@@ -125,7 +127,6 @@ class Screen:
             pygame.draw.rect(
                 self.window,
                 color,
-                # FIXME small gap between lines on some bar numbers
                 (x, y, self.bar_width, self.height),
             )
         pygame.display.update()
@@ -181,7 +182,9 @@ class Screen:
                 self.drawList(clear_bg=True)
                 yield True
 
-    # TODO add algorithms
+    # TODO add Merge Sort
+    # TODO add Heap Sort
+    # TODO add Quick Sort
 
 
 def main(size=600):
