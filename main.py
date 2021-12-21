@@ -18,16 +18,19 @@ class Screen:
         self.setAscending()
         self.setAlgo()
         self.genList()
-        self.draw()
+        self.update()
 
     def genList(self):
-        lst = [random.randint(1, 100) for _ in range(self.n)]
-        self.lst = lst
-        self.bar_width = self.width // len(lst)
-        self.bar_height = (self.height - self.top_pad) // max(lst)
+        self.list = [random.randint(1, 100) for _ in range(self.n)]
+        self.len_list = len(self.list)
+        self.sorted_list = sorted(self.list)
+        self.reverse_list = sorted(self.list, reverse=True)
+        self.bar_width = self.width // self.len_list
+        self.bar_height = (self.height - self.top_pad) // max(self.list)
 
     # Visualization
-    def draw(self):
+    def update(self):
+        self.gen = self.algo()
         self.window.fill((0, 0, 0))
         # TODO use buttons
         controls = [
@@ -81,12 +84,12 @@ class Screen:
                     self.height,
                 ),
             )
-        for i, val in enumerate(self.lst):
+        for i, val in enumerate(self.list):
             x = i * self.bar_width
             y = self.height - val * self.bar_height
             color = (
-                (sorted(self.lst).index(val) + 1) / len(self.lst) * 255,
-                (sorted(self.lst, reverse=True).index(val) + 1) / len(self.lst) * 255,
+                (self.sorted_list.index(val) + 1) / self.len_list * 255,
+                (self.reverse_list.index(val) + 1) / self.len_list * 255,
                 255,
             )
             pygame.draw.rect(self.window, color, (x, y, self.bar_width, self.height))
@@ -109,9 +112,6 @@ class Screen:
         self.algo_name = name
         self.algo = self.algorithms[name]
 
-    def setGen(self):
-        self.gen = self.algo(self.lst, self.ascending)
-
     def getGen(self):
         return self.gen
 
@@ -119,25 +119,29 @@ class Screen:
         return self.algo_keys
 
     # Algorithms
-    def bubbleSort(self, lst, ascending):
-        for i in range(len(lst) - 1):
-            for j in range(len(lst) - 1 - i):
-                num1 = lst[j]
-                num2 = lst[j + 1]
-                if (num1 > num2 and ascending) or (num1 < num2 and not ascending):
-                    lst[j], lst[j + 1] = lst[j + 1], lst[j]
+    def bubbleSort(self):
+        for i in range(self.len_list - 1):
+            for j in range(self.len_list - 1 - i):
+                num1 = self.list[j]
+                num2 = self.list[j + 1]
+                if (num1 > num2 and self.ascending) or (
+                    num1 < num2 and not self.ascending
+                ):
+                    self.list[j], self.list[j + 1] = self.list[j + 1], self.list[j]
                     self.drawList(clear_bg=True)
                     yield True
 
-    def insertionSort(self, lst, ascending):
-        for i in range(1, len(lst)):
-            current = lst[i]
+    def insertionSort(self):
+        for i in range(1, self.len_list):
+            current = self.list[i]
             while True:
-                ascending_sort = i > 0 and lst[i - 1] > current and ascending
-                descending_sort = i > 0 and lst[i - 1] < current and not ascending
+                ascending_sort = i > 0 and self.list[i - 1] > current and self.ascending
+                descending_sort = (
+                    i > 0 and self.list[i - 1] < current and not self.ascending
+                )
                 if not ascending_sort and not descending_sort:
                     break
-                lst[i], lst[i - 1] = lst[i - 1], current
+                self.list[i], self.list[i - 1] = self.list[i - 1], current
                 i -= 1
                 self.drawList(clear_bg=True)
                 yield True
@@ -147,14 +151,13 @@ class Screen:
 
 def main(size=600):
     # TODO number of bars slider
-    n = 50
+    bars = 50
     sorting = False
-    screen = Screen(size, n)
+    screen = Screen(size, bars)
     clock = pygame.time.Clock()
     # TODO tick slider
     tick = 120
     while True:
-        # TODO speed slider
         clock.tick(tick)
         if sorting:
             try:
@@ -180,8 +183,7 @@ def main(size=600):
                     screen.setAscending(False)
                 if key in screen.getAlgoKeys():
                     screen.setAlgo(key)
-                screen.setGen()
-                screen.draw()
+                screen.update()
 
 
 if __name__ == "__main__":
