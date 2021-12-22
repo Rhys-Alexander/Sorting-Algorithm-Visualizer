@@ -43,6 +43,24 @@ class Visualizer:
             self.bars -= 10
         self.genList()
 
+    def setAlgo(self, key=False):
+        self.algorithms = {
+            "Bubble Sort": self.bubbleSort,
+            "Insertion Sort": self.insertionSort,
+            "Merge Sort": self.mergeSort,
+        }
+        key_to_name = {
+            pygame.K_b: "Bubble Sort",
+            pygame.K_i: "Insertion Sort",
+            pygame.K_m: "Merge Sort",
+        }
+        self.algo_keys = key_to_name.keys()
+        if not key:
+            key = list(self.algo_keys)[0]
+        name = key_to_name[key]
+        self.algo_name = name
+        self.algo = self.algorithms[name]
+
     # Visualization
     def update(self):
         self.gen = self.algo()
@@ -127,26 +145,6 @@ class Visualizer:
             )
         pygame.display.update()
 
-    # Algorithm Methods
-
-    def setAlgo(self, key=False):
-        self.algorithms = {
-            "Bubble Sort": self.bubbleSort,
-            "Insertion Sort": self.insertionSort,
-            "Merge Sort": self.mergeSort,
-        }
-        key_to_name = {
-            pygame.K_b: "Bubble Sort",
-            pygame.K_i: "Insertion Sort",
-            pygame.K_m: "Merge Sort",
-        }
-        self.algo_keys = key_to_name.keys()
-        if not key:
-            key = list(self.algo_keys)[0]
-        name = key_to_name[key]
-        self.algo_name = name
-        self.algo = self.algorithms[name]
-
     # Algorithms
     def bubbleSort(self):
         for i in range(self.len_list - 1):
@@ -173,7 +171,7 @@ class Visualizer:
                 i -= 1
                 yield True
 
-    # TODO add Merge Sort descending functionality
+    # TODO descending functionality
     def mergeSort(self, start=0, end=False):
         if not end:
             end = self.len_list
@@ -213,8 +211,8 @@ class Visualizer:
 
             yield True
 
-    # TODO add Heap Sort
-    # TODO add Quick Sort
+    # TODO Heap Sort
+    # TODO Quick Sort
 
     # Main function
     def run(self):
