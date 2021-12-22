@@ -2,11 +2,13 @@ import pygame
 import random
 from math import ceil
 
-pygame.init()
 
+class Visualizer:
+    pygame.init()
 
-class Screen:
-    def __init__(self, size):
+    def __init__(self, size=600):
+        self.sorting = False
+        self.ascending = True
         self.bars = 50
         self.tick = 80
         self.width = size // 2 * 3
@@ -15,7 +17,6 @@ class Screen:
         self.font_size = self.height // 20
         self.window = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Sorting Algorithm Visualizer")
-        self.setAscending()
         self.setAlgo()
         self.genList()
         self.update()
@@ -28,12 +29,6 @@ class Screen:
         self.bar_spacing = self.width / self.len_list
         self.bar_width = ceil(self.bar_spacing)
         self.bar_height = (self.height - self.top_pad) // max(self.list)
-
-    def setTick(self, speed):
-        self.tick = speed
-
-    def getTick(self):
-        return self.tick
 
     def changeTick(self, up):
         if up and self.tick < 160:
@@ -52,9 +47,10 @@ class Screen:
     def update(self):
         self.gen = self.algo()
         self.window.fill((0, 0, 0))
+        play_pause = "Pause" if self.sorting else "Play"
         titles1 = [
             f"ARROWS - {self.bars} Bars  {self.tick} Tick",
-            "SPACE - Play/Pause",
+            f"SPACE - {play_pause}",
             "R - Reset",
         ]
         for i, title in enumerate(titles1):
@@ -132,8 +128,6 @@ class Screen:
         pygame.display.update()
 
     # Algorithm Methods
-    def setAscending(self, ascending=True):
-        self.ascending = ascending
 
     def setAlgo(self, key=False):
         self.algorithms = {
@@ -152,12 +146,6 @@ class Screen:
         name = key_to_name[key]
         self.algo_name = name
         self.algo = self.algorithms[name]
-
-    def getGen(self):
-        return self.gen
-
-    def getAlgoKeys(self):
-        return self.algo_keys
 
     # Algorithms
     def bubbleSort(self):
@@ -185,6 +173,7 @@ class Screen:
                 i -= 1
                 yield True
 
+    # TODO add Merge Sort descending functionality
     def mergeSort(self, start=0, end=False):
         if not end:
             end = self.len_list
@@ -224,53 +213,50 @@ class Screen:
 
             yield True
 
-    # TODO add Merge Sort descending functionality
     # TODO add Heap Sort
     # TODO add Quick Sort
 
+    # Main function
+    def run(self):
+        clock = pygame.time.Clock()
+        while True:
+            clock.tick(self.tick)
+            if self.sorting:
+                try:
+                    next(self.gen)
+                except StopIteration:
+                    self.sorting = False
+                self.drawList(clear_bg=True)
 
-def main(size=600):
-    sorting = False
-    screen = Screen(size)
-    clock = pygame.time.Clock()
-    while True:
-        clock.tick(screen.getTick())
-        if sorting:
-            try:
-                next(screen.getGen())
-            except StopIteration:
-                sorting = False
-            screen.drawList(clear_bg=True)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return
-            if event.type == pygame.KEYDOWN:
-                key = event.key
-                if key == pygame.K_r:
-                    screen.genList()
-                    sorting = False
-                elif key == pygame.K_SPACE:
-                    sorting = False if sorting else True
-                elif key == pygame.K_a:
-                    screen.setAscending(True)
-                elif key == pygame.K_d:
-                    screen.setAscending(False)
-                elif key == pygame.K_LEFT:
-                    screen.changeBars(False)
-                    sorting = False
-                elif key == pygame.K_RIGHT:
-                    screen.changeBars(True)
-                    sorting = False
-                elif key == pygame.K_DOWN:
-                    screen.changeTick(False)
-                elif key == pygame.K_UP:
-                    screen.changeTick(True)
-                if key in screen.getAlgoKeys():
-                    screen.setAlgo(key)
-                screen.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+                if event.type == pygame.KEYDOWN:
+                    key = event.key
+                    if key == pygame.K_r:
+                        self.genList()
+                        self.sorting = False
+                    elif key == pygame.K_SPACE:
+                        self.sorting = False if self.sorting else True
+                    elif key == pygame.K_a:
+                        self.ascending = True
+                    elif key == pygame.K_d:
+                        self.ascending = False
+                    elif key == pygame.K_LEFT:
+                        self.changeBars(False)
+                        self.sorting = False
+                    elif key == pygame.K_RIGHT:
+                        self.changeBars(True)
+                        self.sorting = False
+                    elif key == pygame.K_DOWN:
+                        self.changeTick(False)
+                    elif key == pygame.K_UP:
+                        self.changeTick(True)
+                    elif key in self.algo_keys:
+                        self.setAlgo(key)
+                    self.update()
 
 
 if __name__ == "__main__":
-    main()
+    Visualizer().run()
