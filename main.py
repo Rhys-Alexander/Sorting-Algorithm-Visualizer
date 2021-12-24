@@ -222,9 +222,10 @@ class Visualizer:
             if self.sorting:
                 try:
                     next(self.gen)
+                    self.drawList(clear_bg=True)
                 except StopIteration:
                     self.sorting = False
-                self.drawList(clear_bg=True)
+                    self.update()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
