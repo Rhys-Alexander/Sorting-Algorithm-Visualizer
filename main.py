@@ -171,7 +171,7 @@ class Visualizer:
                 i -= 1
                 yield True
 
-    # TODO descending functionality
+    # TODO descending functionality https://www.geeksforgeeks.org/merge-sort/
     def mergeSort(self, start=0, end=False):
         if not end:
             end = self.len_list
@@ -211,8 +211,9 @@ class Visualizer:
 
             yield True
 
-    # TODO Heap Sort
-    # TODO Quick Sort
+    # TODO Heap Sort https://www.geeksforgeeks.org/heap-sort/
+    # TODO Quick Sort https://www.geeksforgeeks.org/quick-sort/
+    # TODO check sort against https://clementmihailescu.github.io/Sorting-Visualizer/
 
     # Main function
     def run(self):
