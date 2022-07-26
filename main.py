@@ -22,12 +22,11 @@ class Visualizer:
         self.update()
 
     def genList(self):
-        self.list = [random.randint(1, 100) for _ in range(self.bars)]
-        self.sorted_list = sorted(self.list)
-        self.reverse_list = sorted(self.list, reverse=True)
+        self.list = [100 / self.bars * (i + 1) for i in range(self.bars)]
+        random.shuffle(self.list)
         self.bar_spacing = self.width / self.bars
         self.bar_width = ceil(self.bar_spacing)
-        self.bar_height = (self.height - self.top_pad) // max(self.list)
+        self.bar_height = (self.height - self.top_pad) // 100
 
     def changeTick(self, up):
         if up and self.tick < 160:
@@ -133,8 +132,8 @@ class Visualizer:
             x = i * self.bar_spacing
             y = self.height - val * self.bar_height
             color = (
-                (self.sorted_list.index(val) + 1) / self.bars * 255,
-                (self.reverse_list.index(val) + 1) / self.bars * 255,
+                val * 2.55,
+                (100 - val) * 2.55,
                 255,
             )
             pygame.draw.rect(
