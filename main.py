@@ -23,10 +23,9 @@ class Visualizer:
 
     def genList(self):
         self.list = [random.randint(1, 100) for _ in range(self.bars)]
-        self.len_list = len(self.list)
         self.sorted_list = sorted(self.list)
         self.reverse_list = sorted(self.list, reverse=True)
-        self.bar_spacing = self.width / self.len_list
+        self.bar_spacing = self.width / self.bars
         self.bar_width = ceil(self.bar_spacing)
         self.bar_height = (self.height - self.top_pad) // max(self.list)
 
@@ -134,8 +133,8 @@ class Visualizer:
             x = i * self.bar_spacing
             y = self.height - val * self.bar_height
             color = (
-                (self.sorted_list.index(val) + 1) / self.len_list * 255,
-                (self.reverse_list.index(val) + 1) / self.len_list * 255,
+                (self.sorted_list.index(val) + 1) / self.bars * 255,
+                (self.reverse_list.index(val) + 1) / self.bars * 255,
                 255,
             )
             pygame.draw.rect(
@@ -147,8 +146,8 @@ class Visualizer:
 
     # Algorithms
     def bubbleSort(self):
-        for i in range(self.len_list - 1):
-            for j in range(self.len_list - 1 - i):
+        for i in range(self.bars - 1):
+            for j in range(self.bars - 1 - i):
                 num1 = self.list[j]
                 num2 = self.list[j + 1]
                 if (num1 > num2 and self.ascending) or (
@@ -158,7 +157,7 @@ class Visualizer:
                     yield True
 
     def insertionSort(self):
-        for i in range(1, self.len_list):
+        for i in range(1, self.bars):
             current = self.list[i]
             while True:
                 ascending_sort = i > 0 and self.list[i - 1] > current and self.ascending
@@ -174,7 +173,7 @@ class Visualizer:
     # TODO descending functionality https://www.geeksforgeeks.org/merge-sort/
     def mergeSort(self, start=0, end=False):
         if not end:
-            end = self.len_list
+            end = self.bars
         if end - start > 1:
             middle = (start + end) // 2
 
