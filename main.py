@@ -1,3 +1,4 @@
+from ast import Yield
 import pygame
 import random
 from math import ceil
@@ -204,11 +205,40 @@ class Visualizer:
                 c += 1
                 yield True
 
-    # TODO Quick Sort https://www.geeksforgeeks.org/quick-sort/
-    def quickSort(self):
-        pass
+    def quickSort(self, low=0, high=None):
+        if high is None:
+            high = self.bars - 1
+        partition = self.quickSortPartition(low, high)
+        while low < high:
+            while True:
+                try:
+                    pi = next(partition)
+                    break
+                except StopIteration:
+                    partition = self.quickSortPartition(low, high)
+                    break
+            if pi:
+                if pi - low < high - pi:
+                    yield from self.quickSort(low, pi - 1)
+                    low = pi + 1
+                else:
+                    yield from self.quickSort(pi + 1, high)
+                    high = pi - 1
+            else:
+                yield True
 
-    # TODO check sort against https://clementmihailescu.github.io/Sorting-Visualizer/
+    # TODO add descending
+    def quickSortPartition(self, l, h):
+        pivot = self.list[h]
+        i = l - 1
+        for j in range(l, h):
+            if self.list[j] <= pivot:
+                i = i + 1
+                (self.list[i], self.list[j]) = (self.list[j], self.list[i])
+                yield False
+
+        (self.list[i + 1], self.list[h]) = (self.list[h], self.list[i + 1])
+        yield i + 1
 
     # Main function
     def run(self):
