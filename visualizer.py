@@ -20,6 +20,7 @@ class Visualizer:
         self.setAlgo()
         self.genList()
         self.update()
+        self.gen = self.algo()
 
     def genList(self):
         self.list = [100 / self.bars * (i + 1) for i in range(self.bars)]
@@ -52,7 +53,6 @@ class Visualizer:
             key = list(self.algorithms.keys())[0]
         self.algo_name = self.algorithms[key][0]
         self.algo = self.algorithms[key][1]
-        self.gen = self.algo()
 
     # Visualization
     def update(self):
@@ -259,27 +259,31 @@ class Visualizer:
                     return
                 if event.type == pygame.KEYDOWN:
                     key = event.key
-                    if key == pygame.K_r:
-                        self.genList()
-                        self.sorting = False
-                    elif key == pygame.K_SPACE:
+                    if key == pygame.K_SPACE:
                         self.sorting = False if self.sorting else True
-                    elif key == pygame.K_a:
-                        self.ascending = True
-                    elif key == pygame.K_d:
-                        self.ascending = False
-                    elif key == pygame.K_LEFT:
-                        self.changeBars(False)
-                        self.sorting = False
-                    elif key == pygame.K_RIGHT:
-                        self.changeBars(True)
-                        self.sorting = False
                     elif key == pygame.K_DOWN:
                         self.changeTick(False)
                     elif key == pygame.K_UP:
                         self.changeTick(True)
-                    elif key in self.algorithms.keys():
-                        self.setAlgo(key)
+                    else:
+                        if key == pygame.K_r:
+                            self.genList()
+                            self.sorting = False
+                        elif key == pygame.K_a:
+                            self.ascending = True
+                        elif key == pygame.K_d:
+                            self.ascending = False
+                        elif key == pygame.K_LEFT:
+                            self.changeBars(False)
+                            self.sorting = False
+                        elif key == pygame.K_RIGHT:
+                            self.changeBars(True)
+                            self.sorting = False
+                        elif key in self.algorithms.keys():
+                            self.setAlgo(key)
+                        else:
+                            continue
+                        self.gen = self.algo()
                     self.update()
 
 
