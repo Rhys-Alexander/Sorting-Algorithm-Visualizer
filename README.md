@@ -1,6 +1,6 @@
 # Sorting Algorithm Visualizer
 
-Python program that visualizes different sorting algorithms.
+Python [program](visualizer.py) that visualizes different sorting algorithms.
 
 Can do this both Ascending and Descending!
 
