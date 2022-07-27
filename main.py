@@ -43,21 +43,15 @@ class Visualizer:
 
     def setAlgo(self, key=False):
         self.algorithms = {
-            "Bubble Sort": self.bubbleSort,
-            "Insertion Sort": self.insertionSort,
-            "Merge Sort": self.mergeSort,
+            pygame.K_b: ("Bubble Sort", self.bubbleSort),
+            pygame.K_i: ("Insertion Sort", self.insertionSort),
+            pygame.K_m: ("Merge Sort", self.mergeSort),
+            pygame.K_q: ("Quick Sort", self.quickSort),
         }
-        key_to_name = {
-            pygame.K_b: "Bubble Sort",
-            pygame.K_i: "Insertion Sort",
-            pygame.K_m: "Merge Sort",
-        }
-        self.algo_keys = key_to_name.keys()
         if not key:
-            key = list(self.algo_keys)[0]
-        name = key_to_name[key]
-        self.algo_name = name
-        self.algo = self.algorithms[name]
+            key = list(self.algorithms.keys())[0]
+        self.algo_name = self.algorithms[key][0]
+        self.algo = self.algorithms[key][1]
 
     # Visualization
     def update(self):
@@ -99,7 +93,9 @@ class Visualizer:
                 (self.width // 2, 10 + self.font_size * i),
             )
 
-        algorithms = [f"{name[0]} - {name}" for name in self.algorithms.keys()]
+        algorithms = [
+            f"{name[0]} - {name}" for name in (x for x, _ in self.algorithms.values())
+        ]
         for i, algo in enumerate(algorithms):
             color = 255, 255, 255
             if algo[0] == self.algo_name[0]:
@@ -207,10 +203,10 @@ class Visualizer:
                 c += 1
                 yield True
 
-            yield True
-
-    # TODO Heap Sort https://www.geeksforgeeks.org/heap-sort/
     # TODO Quick Sort https://www.geeksforgeeks.org/quick-sort/
+    def quickSort(self):
+        pass
+
     # TODO check sort against https://clementmihailescu.github.io/Sorting-Visualizer/
 
     # Main function
@@ -251,7 +247,7 @@ class Visualizer:
                         self.changeTick(False)
                     elif key == pygame.K_UP:
                         self.changeTick(True)
-                    elif key in self.algo_keys:
+                    elif key in self.algorithms.keys():
                         self.setAlgo(key)
                     self.update()
 
