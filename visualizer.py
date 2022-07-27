@@ -52,10 +52,10 @@ class Visualizer:
             key = list(self.algorithms.keys())[0]
         self.algo_name = self.algorithms[key][0]
         self.algo = self.algorithms[key][1]
+        self.gen = self.algo()
 
     # Visualization
     def update(self):
-        self.gen = self.algo()
         self.window.fill((0, 0, 0))
         play_pause = "Pause" if self.sorting else "Play"
         titles1 = [
