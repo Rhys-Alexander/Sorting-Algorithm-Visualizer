@@ -227,12 +227,13 @@ class Visualizer:
             else:
                 yield True
 
-    # TODO add descending
     def quickSortPartition(self, l, h):
         pivot = self.list[h]
         i = l - 1
         for j in range(l, h):
-            if self.list[j] <= pivot:
+            if (self.list[j] <= pivot and self.ascending) or (
+                self.list[j] > pivot and not self.ascending
+            ):
                 i = i + 1
                 (self.list[i], self.list[j]) = (self.list[j], self.list[i])
                 yield False
