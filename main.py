@@ -159,30 +159,31 @@ class Visualizer:
                 descending_sort = (
                     i > 0 and self.list[i - 1] < current and not self.ascending
                 )
-                if not ascending_sort and not descending_sort:
+                if not (ascending_sort or descending_sort):
                     break
                 self.list[i], self.list[i - 1] = self.list[i - 1], current
                 i -= 1
                 yield True
 
-    # TODO descending functionality https://www.geeksforgeeks.org/merge-sort/
     def mergeSort(self, start=0, end=False):
         if not end:
             end = self.bars
         if end - start > 1:
-            middle = (start + end) // 2
+            mid = (start + end) // 2
 
-            yield from self.mergeSort(start, middle)
-            yield from self.mergeSort(middle, end)
-            left = self.list[start:middle]
-            right = self.list[middle:end]
+            yield from self.mergeSort(start, mid)
+            yield from self.mergeSort(mid, end)
+            left = self.list[start:mid]
+            right = self.list[mid:end]
 
             a = 0
             b = 0
             c = start
 
             while a < len(left) and b < len(right):
-                if left[a] < right[b]:
+                if (left[a] < right[b] and self.ascending) or (
+                    left[a] > right[b] and not self.ascending
+                ):
                     self.list[c] = left[a]
                     a += 1
                 else:
