@@ -6,7 +6,7 @@ from math import ceil
 class Visualizer:
     pygame.init()
 
-    def __init__(self, size=600):
+    def __init__(self, size=720):
         self.sorting = False
         self.ascending = True
         self.bars = 64
@@ -14,7 +14,7 @@ class Visualizer:
         self.width = size // 2 * 3
         self.height = size
         self.top_pad = self.height / 4
-        self.font_size = self.height // 20
+        self.font_size = self.height // 24
         self.window = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Sorting Algorithm Visualizer")
         self.setAlgo()
@@ -71,7 +71,7 @@ class Visualizer:
                     1,
                     (255, 255, 255),
                 ),
-                (10, 10 + self.font_size * i),
+                (self.width // 3, 10 + self.font_size * i),
             )
 
         titles2 = [
@@ -91,7 +91,7 @@ class Visualizer:
                     1,
                     color,
                 ),
-                (self.width // 2, 10 + self.font_size * i),
+                (self.width // 3 * 2, 10 + self.font_size * i),
             )
 
         algorithms = [
@@ -108,7 +108,7 @@ class Visualizer:
                     1,
                     color,
                 ),
-                (self.width / 4 * 3, 10 + self.font_size * i),
+                (10, 10 + self.font_size * i),
             )
 
         self.drawList()
