@@ -9,8 +9,8 @@ class Visualizer:
     def __init__(self, size=600):
         self.sorting = False
         self.ascending = True
-        self.bars = 50
-        self.tick = 80
+        self.bars = 64
+        self.tick = 64
         self.width = size // 2 * 3
         self.height = size
         self.top_pad = self.height / 4
@@ -30,16 +30,16 @@ class Visualizer:
         self.bar_height = (self.height - self.top_pad) // 100
 
     def changeTick(self, up):
-        if up and self.tick < 160:
+        if up and self.tick < 256:
             self.tick *= 2
-        elif not up and self.tick > 5:
+        elif not up and self.tick > 4:
             self.tick //= 2
 
     def changeBars(self, up):
-        if up and self.bars < 200:
-            self.bars += 10
-        elif not up and self.bars > 10:
-            self.bars -= 10
+        if up and self.bars < 256:
+            self.bars *= 2
+        elif not up and self.bars > 4:
+            self.bars //= 2
         self.genList()
 
     def setAlgo(self, key=False):
