@@ -48,6 +48,7 @@ class Visualizer:
             pygame.K_i: ("Insertion Sort", self.insertionSort),
             pygame.K_m: ("Merge Sort", self.mergeSort),
             pygame.K_q: ("Quick Sort", self.quickSort),
+            pygame.K_s: ("Stupid Sort", self.stupidSort),
         }
         if not key:
             key = list(self.algorithms.keys())[0]
@@ -239,6 +240,15 @@ class Visualizer:
 
         (self.list[i + 1], self.list[h]) = (self.list[h], self.list[i + 1])
         yield i + 1
+
+    def stupidSort(self):
+        while not (
+            self.list == sorted(self.list)
+            if self.ascending
+            else self.list == sorted(self.list, reverse=True)
+        ):
+            random.shuffle(self.list)
+            yield True
 
     # Main function
     def run(self):
