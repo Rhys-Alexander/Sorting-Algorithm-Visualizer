@@ -9,6 +9,7 @@ Why my sorting algorithm visulaiser is unique:
 - can pause and play mid sort
 
 <img src='examples/unsorted.png' alt='example pic' width=500px>
+<img src='examples/merge.png' alt='example pic' width=500px>
 <img src='examples/sorted.png' alt='example pic' width=500px>
 
 ## Algorithms
