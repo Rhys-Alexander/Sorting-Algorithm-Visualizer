@@ -48,7 +48,8 @@ class Visualizer:
             pygame.K_i: ("Insertion Sort", self.insertionSort),
             pygame.K_m: ("Merge Sort", self.mergeSort),
             pygame.K_q: ("Quick Sort", self.quickSort),
-            pygame.K_s: ("Stupid Sort", self.stupidSort),
+            pygame.K_c: ("Crazy Sort", self.crazySort),
+            pygame.K_s: ("Selection Sort", self.selectionSort),
         }
         if not key:
             key = list(self.algorithms.keys())[0]
@@ -166,6 +167,20 @@ class Visualizer:
                 i -= 1
                 yield True
 
+    def selectionSort(self):
+        for i in range(self.bars - 1):
+            k = i
+            for j in range(i + 1, self.bars):
+                if (
+                    self.list[j] < self.list[k]
+                    and self.ascending
+                    or self.list[j] > self.list[k]
+                    and not self.ascending
+                ):
+                    k = j
+            self.list[i], self.list[k] = self.list[k], self.list[i]
+            yield True
+
     def mergeSort(self, start=0, end=False):
         if not end:
             end = self.bars
@@ -241,7 +256,7 @@ class Visualizer:
         (self.list[i + 1], self.list[h]) = (self.list[h], self.list[i + 1])
         yield i + 1
 
-    def stupidSort(self):
+    def crazySort(self):
         while not (
             self.list == sorted(self.list)
             if self.ascending
