@@ -19,6 +19,7 @@ Why my sorting algorithm visulaiser is unique:
 - Merge Sort
 - Quick Sort
 - Stupid Sort
+- Selection Sort
 
 ## Requirements
 
